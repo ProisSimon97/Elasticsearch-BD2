@@ -149,7 +149,7 @@ public class PostAdapter implements PostPort {
             SearchResponse<Post> response = client.search(s -> s
                             .index(INDEX)
                             .query(q -> q
-                                    .match(t -> t
+                                    .matchPhrase(t -> t
                                             .field("author")
                                             .query(author)
                                     )
