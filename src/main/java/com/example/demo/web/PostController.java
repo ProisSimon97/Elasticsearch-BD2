@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/posts")
 @CrossOrigin
 public class PostController {
-    /*private final PostService service;
+    private final PostService service;
 
     @PostMapping
     public void create(PostCreateRequest request) {
@@ -28,7 +28,7 @@ public class PostController {
         return service.getOne(id);
     }
 
-    @GetMapping("/latest")
+    /*@GetMapping("/latest")
     public List<PostPartialResponse> findLatest() {
         return service.getLatest().stream()
                 .map(PostWebMapper::mapToResponse)

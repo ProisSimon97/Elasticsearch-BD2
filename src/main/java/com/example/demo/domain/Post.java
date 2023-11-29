@@ -1,14 +1,21 @@
 package com.example.demo.domain;
 
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown=true)
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Post {
+
     private String id;
     private String title;
     private String resume;

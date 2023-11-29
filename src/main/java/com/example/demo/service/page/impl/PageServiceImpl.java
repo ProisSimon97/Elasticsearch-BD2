@@ -20,6 +20,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public List<Page> find(String id) {
-        return null;
+        return List.of(port.findPage(id)
+                .orElseThrow(RuntimeException::new));
     }
 }
