@@ -28,21 +28,21 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getLatest() {
-        return null;
+        return port.findLatest();
     }
 
     @Override
     public List<PostByAuthor> getAllAuthors() {
-        return null;
+        return port.findCountByAuthors();
     }
 
     @Override
     public List<Post> getByAuthor(String author) {
-        return null;
+        return port.findByAuthor(author);
     }
 
     @Override
     public List<Post> getByTextMatch(String text) {
-        return null;
+        return port.findByText(text);
     }
 }

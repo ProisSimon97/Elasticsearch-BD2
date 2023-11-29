@@ -39,7 +39,7 @@ public class PageAdapter implements PagePort {
 
              return Optional.ofNullable(getResponse.source());
         } catch(IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 }

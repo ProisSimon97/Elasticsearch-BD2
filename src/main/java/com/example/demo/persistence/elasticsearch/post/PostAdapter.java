@@ -1,10 +1,17 @@
 package com.example.demo.persistence.elasticsearch.post;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.FieldAndFormat;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import com.example.demo.domain.Page;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.example.demo.domain.Post;
+import com.example.demo.domain.PostByAuthor;
 import com.example.demo.service.database.PostPort;
+import com.example.demo.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +64,107 @@ public class PostAdapter implements PostPort {
 
     @Override
     public List<Post> findLatest() {
-        return null;
+        try {
+            SearchResponse<Post> response = client.search(s -> s
+                            .index(INDEX)
+                            .fields(List.of(
+                                    FieldAndFormat.of(ff -> ff.field("title")),
+                                    FieldAndFormat.of(ff -> ff.field("resume"))))
+                            .sort(List.of(
+                                    new SortOptions.Builder().field(f -> f.field("date").order(SortOrder.Desc)
+                                    ).build()))
+                            .from(0)
+                            .size(2),
+                    Post.class
+            );
+
+            return response.hits()
+                    .hits()
+                    .stream()
+                    .map(PostMapper::map)
+                    .toList();
+
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<PostByAuthor> findCountByAuthors() {
+        try {
+            Query query = MatchQuery.of(m -> m
+                    .field("author")
+                    .query("string")
+            )._toQuery();
+
+            SearchResponse<Void> response = client.search(b -> b
+                            .index(INDEX)
+                            .size(0)
+                            .query(query)
+                            .aggregations("count", a -> a
+                                    .histogram(h -> h
+                                            .field("author")
+
+                                    )
+                            ),
+                    Void.class
+            );
+
+            response.aggregations();
+
+            return null;
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Post> findByText(String text) {
+        try {
+            SearchResponse<Post> response = client.search(s -> s
+                            .index(INDEX)
+                            .query(q -> q
+                                    .match(t -> t
+                                            .field("text")
+                                            .query(text)
+                                    )
+                            ),
+                    Post.class
+            );
+
+            return response.hits()
+                    .hits()
+                    .stream()
+                    .map(PostMapper::mapHit)
+                    .toList();
+
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Post> findByAuthor(String author) {
+        try {
+            SearchResponse<Post> response = client.search(s -> s
+                            .index(INDEX)
+                            .query(q -> q
+                                    .match(t -> t
+                                            .field("author")
+                                            .query(author)
+                                    )
+                            ),
+                    Post.class
+            );
+
+            return response.hits()
+                    .hits()
+                    .stream()
+                    .map(PostMapper::mapHit)
+                    .toList();
+
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.service.mapper;
 
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostByAuthor;
 
@@ -7,31 +8,24 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class PostMapper {
-   /* public static Post map(Document document) {
+   public static Post map(Hit<Post> postHit) {
+       return Post.builder()
+               .id(postHit.id())
+               .resume(postHit.source().getResume())
+               .title(postHit.source().getTitle())
+               .build();
+   }
+
+    public static Post mapHit(Hit<Post> postHit) {
         return Post.builder()
-                .id(document.getObjectId("_id").toString())
-                .title(document.getString("title"))
-                .resume(document.getString("resume"))
-                .text(document.getString("text"))
-                .tags(document.getList("tags", String.class))
-                .relatedLinks(document.getList("relatedLinks", String.class))
-                .author(document.getString("author"))
-                .date(LocalDate.parse(document.getString("date"), DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .id(postHit.id())
+                .resume(postHit.source().getResume())
+                .title(postHit.source().getTitle())
+                .text(postHit.source().getText())
+                .tags(postHit.source().getTags())
+                .relatedLinks(postHit.source().getRelatedLinks())
+                .author(postHit.source().getAuthor())
+                .date(postHit.source().getDate())
                 .build();
     }
-
-    public static Post mapPartial(Document document) {
-        return Post.builder()
-                .id(document.getObjectId("_id").toString())
-                .title(document.getString("title"))
-                .resume(document.getString("resume"))
-                .build();
-    }
-
-    public static PostByAuthor mapToAuthor(Document document) {
-        return PostByAuthor.builder()
-                .id(document.getString("_id"))
-                .count(document.getInteger("count"))
-                .build();
-    }*/
 }

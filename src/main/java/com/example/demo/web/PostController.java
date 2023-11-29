@@ -28,7 +28,7 @@ public class PostController {
         return service.getOne(id);
     }
 
-    /*@GetMapping("/latest")
+    @GetMapping("/latest")
     public List<PostPartialResponse> findLatest() {
         return service.getLatest().stream()
                 .map(PostWebMapper::mapToResponse)
@@ -50,5 +50,5 @@ public class PostController {
     @GetMapping("/search/{text}")
     public List<Post> findAByText(@PathVariable String text) {
         return service.getByTextMatch(text);
-    }*/
+    }
 }
