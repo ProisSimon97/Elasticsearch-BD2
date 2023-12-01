@@ -3,9 +3,8 @@ package com.example.demo.persistence.elasticsearch.post;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.FieldAndFormat;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.example.demo.domain.Post;
@@ -92,27 +91,23 @@ public class PostAdapter implements PostPort {
     @Override
     public List<PostByAuthor> findCountByAuthors() {
         try {
-            Query query = MatchQuery.of(m -> m
-                    .field("author")
-                    .query("string")
-            )._toQuery();
-
             SearchResponse<Void> response = client.search(b -> b
                             .index(INDEX)
                             .size(0)
-                            .query(query)
-                            .aggregations("count", a -> a
-                                    .histogram(h -> h
-                                            .field("author")
-
+                            .aggregations("top-authors", a -> a
+                                    .terms(h -> h
+                                            .field("author.keyword")
                                     )
                             ),
                     Void.class
             );
 
-            response.aggregations();
+            List<StringTermsBucket> buckets = response.aggregations().get("top-authors").sterms().buckets().array();
 
-            return null;
+            return buckets.stream()
+                    .map(PostMapper::mapBucket)
+                    .toList();
+
         } catch(IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,5 +1,6 @@
 package com.example.demo.service.mapper;
 
+import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostByAuthor;
@@ -27,5 +28,12 @@ public class PostMapper {
                 .author(postHit.source().getAuthor())
                 .date(postHit.source().getDate())
                 .build();
+    }
+
+    public static PostByAuthor mapBucket(StringTermsBucket bucket) {
+       return PostByAuthor.builder()
+               .id(bucket.key().stringValue())
+               .count((int) bucket.docCount())
+               .build();
     }
 }
