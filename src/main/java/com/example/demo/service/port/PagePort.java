@@ -1,9 +1,7 @@
-package com.example.demo.service.database;
+package com.example.demo.service.port;
 
-import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.example.demo.domain.Page;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface PagePort {

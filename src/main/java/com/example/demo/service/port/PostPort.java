@@ -1,6 +1,5 @@
-package com.example.demo.service.database;
+package com.example.demo.service.port;
 
-import com.example.demo.domain.Page;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostByAuthor;
 

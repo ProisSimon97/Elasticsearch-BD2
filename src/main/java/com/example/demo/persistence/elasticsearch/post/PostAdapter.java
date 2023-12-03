@@ -9,8 +9,8 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostByAuthor;
-import com.example.demo.service.database.PostPort;
-import com.example.demo.service.mapper.PostMapper;
+import com.example.demo.service.port.PostPort;
+import com.example.demo.domain.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,6 @@ public class PostAdapter implements PostPort {
             client.index(i -> i
                     .index(INDEX)
                     .document(post)
-                    .id(post.getId())
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -43,19 +42,17 @@ public class PostAdapter implements PostPort {
     @Override
     public Optional<Post> findPost(String id) {
         try {
-            GetResponse<Post> getResponse = client.get(s -> s
+            GetResponse<Post> response = client.get(s -> s
                             .index(INDEX)
                             .id(id),
                             Post.class);
 
-            if (getResponse.found()) {
+            return Optional.ofNullable(response.found() ? response.source() : null)
+                    .map(post -> {
+                        post.setId(response.id());
+                        return post;
+                    });
 
-                Post post = getResponse.source();
-                post.setId(getResponse.id());
-                return Optional.of(post);
-            }
-
-            return Optional.empty();
         } catch(IOException e) {
             throw new RuntimeException();
         }
@@ -70,10 +67,12 @@ public class PostAdapter implements PostPort {
                                     FieldAndFormat.of(ff -> ff.field("title")),
                                     FieldAndFormat.of(ff -> ff.field("resume"))))
                             .sort(List.of(
-                                    new SortOptions.Builder().field(f -> f.field("date").order(SortOrder.Desc)
+                                    new SortOptions.Builder()
+                                            .field(f -> f.field("date")
+                                                    .order(SortOrder.Desc)
                                     ).build()))
                             .from(0)
-                            .size(2),
+                            .size(4),
                     Post.class
             );
 
@@ -94,7 +93,7 @@ public class PostAdapter implements PostPort {
             SearchResponse<Void> response = client.search(b -> b
                             .index(INDEX)
                             .size(0)
-                            .aggregations("top-authors", a -> a
+                            .aggregations("count-authors", a -> a
                                     .terms(h -> h
                                             .field("author.keyword")
                                     )
@@ -102,7 +101,11 @@ public class PostAdapter implements PostPort {
                     Void.class
             );
 
-            List<StringTermsBucket> buckets = response.aggregations().get("top-authors").sterms().buckets().array();
+            List<StringTermsBucket> buckets = response.aggregations()
+                    .get("count-authors")
+                    .sterms()
+                    .buckets()
+                    .array();
 
             return buckets.stream()
                     .map(PostMapper::mapBucket)
@@ -118,6 +121,11 @@ public class PostAdapter implements PostPort {
         try {
             SearchResponse<Post> response = client.search(s -> s
                             .index(INDEX)
+                            .fields(List.of(
+                                    FieldAndFormat.of(ff -> ff.field("title")),
+                                    FieldAndFormat.of(ff -> ff.field("resume")),
+                                    FieldAndFormat.of(ff -> ff.field("author")),
+                                    FieldAndFormat.of(ff -> ff.field("date"))))
                             .query(q -> q
                                     .match(t -> t
                                             .field("text")
@@ -130,7 +138,7 @@ public class PostAdapter implements PostPort {
             return response.hits()
                     .hits()
                     .stream()
-                    .map(PostMapper::mapHit)
+                    .map(PostMapper::mapTextHit)
                     .toList();
 
         } catch(IOException e) {

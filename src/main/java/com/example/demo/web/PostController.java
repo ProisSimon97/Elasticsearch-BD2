@@ -36,7 +36,7 @@ public class PostController {
     }
 
     @GetMapping("/byauthor")
-    public List<PostByAuthorResponse> findAllByAuthor() {
+    public List<PostByAuthorResponse> findAllAuthors() {
         return service.getAllAuthors().stream()
                 .map(PostWebMapper::mapToAuthorResponse)
                 .toList();

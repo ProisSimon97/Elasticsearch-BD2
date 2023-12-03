@@ -3,7 +3,7 @@ package com.example.demo.persistence.elasticsearch.page;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.example.demo.domain.Page;
-import com.example.demo.service.database.PagePort;
+import com.example.demo.service.port.PagePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

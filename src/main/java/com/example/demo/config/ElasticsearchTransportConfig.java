@@ -1,6 +1,5 @@
 package com.example.demo.config;
 
-import co.elastic.clients.transport.TransportOptions;
 import org.elasticsearch.client.RestClient;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.elastic.clients.json.JsonpMapper;

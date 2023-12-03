@@ -2,12 +2,11 @@ package com.example.demo.service.post.impl;
 
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostByAuthor;
-import com.example.demo.service.database.PostPort;
+import com.example.demo.service.port.PostPort;
 import com.example.demo.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

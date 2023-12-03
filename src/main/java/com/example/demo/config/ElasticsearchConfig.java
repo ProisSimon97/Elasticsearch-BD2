@@ -28,7 +28,7 @@ public class ElasticsearchConfig {
     @Bean
     public ElasticsearchClient client() {
         RestClient restClient = RestClient
-                .builder(HttpHost.create("https://4dce2003c59d43bda66d5ac806e49411.us-central1.gcp.cloud.es.io:9243"))
+                .builder(HttpHost.create(serverUrl))
                 .setDefaultHeaders(new Header[]{
                         new BasicHeader("Authorization", "ApiKey " + apiKey)
                 })
@@ -36,7 +36,6 @@ public class ElasticsearchConfig {
 
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule());
-
 
         return new ElasticsearchClient(transportConfig.customRestClientTransport(restClient, new JacksonJsonpMapper(objectMapper)));
     }
